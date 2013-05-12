@@ -32,7 +32,7 @@ Using ScriptCS.ClrMD in REPL mode is probably the most powerful way to work with
    > clrRuntime.GetHeapStatsByType().ToList().ForEach(s => Console.WriteLine("{0,12:n0} {1,12:n0} {2}", s.TotalHeapSize, s.NumberOfInstances, s.TypeName));
 ```
 
-And here's a sample of the output that the final command above command might output to the REPL window:
+Here's a sample of the output the command above command might output to the REPL window:
 ```
       1,672           21 System.String[]
       1,838           20 System.Char[]
@@ -41,6 +41,12 @@ And here's a sample of the output that the final command above command might out
      12,232          249 System.String
      36,192           42 System.Object[]
 ```
+
+```csharp
+    // Finally we can detatch from the process to let it resume executing once we're done inspecting it
+    clrmd.DetatchFromCurrentProcess();
+```
+
 Getting Started with the ClrMD Script Pack - Script Style
 ----
 Of course if you have standard analysis that you might want to perform, it would make sense to store those in a reusable script. 
