@@ -68,9 +68,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="LICENSE.md" />
     <None Include="packages.config" />
-    <None Include="README.md" />
     <None Include="ScriptCs.ClrMD.nuspec" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
