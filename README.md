@@ -1,21 +1,23 @@
 ScriptCS.ClrMD
-----
+====
 This is a [ScriptCS](http://github.com/scriptcs/scriptcs) script pack that brings in features 
 of the ClrMD API which can then be used for scripted or interactive diagnostics (via REPL) 
 against any running CLR process.
 
 
 What is ClrMD?
-----
+====
 For an introduction to ClrMD and its API you can [check out this blog post](http://blogs.msdn.com/b/dotnet/archive/2013/05/01/net-crash-dump-and-live-process-inspection.aspx) on [the .NET Framework Blog](http://blogs.msdn.com/b/dotnet/).
 
-Getting Started with the ClrMD Script Pack - REPL Style
+Getting Started with the ClrMD Script Pack
+====
+REPL Style
 ----
 Using ScriptCS.ClrMD in REPL mode is probably the most powerful way to work with it, so let's take a quick look at how that works:
 
    1. Start by installing the ScriptCs.ClrMD script pack: ```scriptcs -install ScriptCs.ClrMD```
    2. Launch scriptcs in REPL mode: ```scriptcs```
-   3. One in the REPL cmnd prompt you can simply attach to a process and begin interacting with it using ClrMD plus the various extensions that are automatically 
+   3. Once you are at the REPL prompt you can simply attach to a process and begin interacting with it using ClrMD plus the various extensions that are automatically 
    imported by the ScriptCs.ClrMD script pack like so:
 
 ```csharp
@@ -44,10 +46,10 @@ Here's a sample of the output the command above command might output to the REPL
 
 ```csharp
     // Finally we can detatch from the process to let it resume executing once we're done inspecting it
-    clrmd.DetatchFromCurrentProcess();
+    > clrmd.DetatchFromCurrentProcess();
 ```
 
-Getting Started with the ClrMD Script Pack - Script Style
+Script Style
 ----
 Of course if you have standard analysis that you might want to perform, it would make sense to store those in a reusable script. 
 Here's a quick example of what that kind of workflow might look like:
