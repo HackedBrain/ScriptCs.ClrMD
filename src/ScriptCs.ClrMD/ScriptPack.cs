@@ -32,7 +32,7 @@ namespace HackedBrain.ScriptCs.ClrMd
 					&&
 				this.clrMdPack.IsAttached)
 			{
-				this.clrMdPack.Detatch();
+				this.clrMdPack.Detach();
 				this.clrMdPack = null;
 			}
 		}
