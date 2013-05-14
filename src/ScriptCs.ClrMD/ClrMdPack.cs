@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Diagnostics.Contracts;
 using Microsoft.Diagnostics.Runtime;
 using Microsoft.Diagnostics.Runtime.Interop;
 using ScriptCs.Contracts;
@@ -46,6 +42,21 @@ namespace HackedBrain.ScriptCs.ClrMd
 			get
 			{
 				return this.currentProcess;
+			}
+		}
+
+		public IOutputWriter OutputWriter
+		{
+			get
+			{
+				return this.outputWriter;
+			}
+
+			set
+			{
+				Contract.Requires(value != null);
+				
+				this.outputWriter = value;
 			}
 		}
 		
