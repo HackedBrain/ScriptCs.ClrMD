@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Diagnostics.Runtime;
 using Microsoft.Diagnostics.Runtime.Interop;
@@ -15,13 +16,45 @@ namespace HackedBrain.ScriptCs.ClrMd
 		private const int DefaultAttachWaitTimeMilliseconds = 5000;
 
 		private DataTarget currentDataTarget;
-		
-		public ClrRuntime AttachToProcess(string processName)
+		private ClrRuntime currentClrRuntime;
+		private Process currentProcess;
+		private IOutputWriter outputWriter;
+
+		public ClrMdPack()
 		{
-			return this.AttachToProcess(processName, ClrMdPack.DefaultAttachWaitTimeMilliseconds);
+			this.outputWriter = new ConsoleOutputWriter();
+		}
+
+		public bool IsAttached
+		{
+			get
+			{
+				return this.AttachedProcess != null;
+			}
+		}
+
+		public ClrRuntime ClrRuntime
+		{
+			get
+			{
+				return this.currentClrRuntime;
+			}
+		}
+
+		public Process AttachedProcess
+		{
+			get
+			{
+				return this.currentProcess;
+			}
 		}
 		
-		public ClrRuntime AttachToProcess(string processName, int attachWaitTimeMilliseconds)
+		public ClrRuntime Attach(string processName)
+		{
+			return this.Attach(processName, ClrMdPack.DefaultAttachWaitTimeMilliseconds);
+		}
+		
+		public ClrRuntime Attach(string processName, int attachWaitTimeMilliseconds)
 		{
 			Process[] processes = Process.GetProcessesByName(processName);
 
@@ -34,62 +67,81 @@ namespace HackedBrain.ScriptCs.ClrMd
 				throw new InvalidOperationException(string.Format("Multiple processes ({0}) with the name \"{1}\" are currently running. Please use AttachToProcess overload specifying process Id instead.", processes.Length, processName));
 			}
 
-			return this.AttachToProcess(processes[0].Id);
+			return this.Attach(processes[0], ClrMdPack.DefaultAttachWaitTimeMilliseconds);
 		}
 
-		public ClrRuntime AttachToProcess(int processId)
+		public ClrRuntime Attach(int processId)
 		{
-			return this.AttachToProcess(processId, ClrMdPack.DefaultAttachWaitTimeMilliseconds);
+			Process processToAttachTo = Process.GetProcessById(processId);
+			
+			return this.Attach(processToAttachTo, ClrMdPack.DefaultAttachWaitTimeMilliseconds);
 		}
 
-		public ClrRuntime AttachToProcess(int processId, int attachWaitTimeMilliseconds)
+		public ClrRuntime Attach(int processId, int attachWaitTimeMilliseconds)
 		{
-			if(this.currentDataTarget != null)
+			Process processToAttachTo = Process.GetProcessById(processId);
+
+			return this.Attach(processToAttachTo, attachWaitTimeMilliseconds);
+		}
+
+		public ClrRuntime Attach(Process process, int attachWaitTimeMilliseconds)
+		{
+			if(this.currentProcess != null)
 			{
 				// TODO: find way to put process id/name in this exception message
 				throw new InvalidOperationException(string.Format("Already attached to a process, use DetatchFromCurrentProcess first."));
 			}
-			
-			this.currentDataTarget = DataTarget.AttachToProcess(processId, (uint)attachWaitTimeMilliseconds);
+
+			DataTarget dataTarget = DataTarget.AttachToProcess(process.Id, (uint)attachWaitTimeMilliseconds);
 
 			// Make sure the CLR is even found
-			if(this.currentDataTarget.ClrVersions.Count == 0)
+			if(dataTarget.ClrVersions.Count == 0)
 			{
-				throw new InvalidOperationException(string.Format("The specified process ({0}) does not appear to have the CLR loaded in it.", processId));
+				throw new InvalidOperationException(string.Format("The specified process {0}:{1} does not appear to have the CLR loaded in it.", process.ProcessName, process.Id));
 			}
-			else if(this.currentDataTarget.ClrVersions.Count > 1)
+			else if(dataTarget.ClrVersions.Count > 1)
 			{
 				// REVISIT: what happens if there's multiple ClrVersions?
 			}
 
-			ClrInfo clrInfo = this.currentDataTarget.ClrVersions[0];		
+			ClrInfo clrInfo = dataTarget.ClrVersions[0];		
 			
 			string dacLocation = clrInfo.TryGetDacLocation();
 
 			// Make sure we found the DAC location, otherwise we can't create the runtime
 			if(string.IsNullOrEmpty(dacLocation))
 			{
-				throw new InvalidOperationException(string.Format("Unable to locate the DAC for the target version of the CLR runtime ({1}).", processId, clrInfo.Version));
+				throw new InvalidOperationException(string.Format("Unable to locate the DAC for the target version of the CLR runtime ({0}) for process {1}:{2}.", clrInfo.Version, process.ProcessName, process.Id));
 			}
 
 			// Make sure that if we're unloaded we don't kill off the process
-			this.currentDataTarget.DebuggerInterface.SetProcessOptions(DEBUG_PROCESS.DETACH_ON_EXIT);
+			dataTarget.DebuggerInterface.SetProcessOptions(DEBUG_PROCESS.DETACH_ON_EXIT);
 
-			return this.currentDataTarget.CreateRuntime(dacLocation);
+			this.currentClrRuntime = dataTarget.CreateRuntime(dacLocation);
+			this.currentDataTarget = dataTarget;
+			this.currentProcess = process;
+
+			this.outputWriter.WriteLine("Successfully attached to {0}:{1}...", process.ProcessName, process.Id);
+			this.outputWriter.WriteLine("CLR Version: {0}", clrInfo.Version);
+
+			return this.currentClrRuntime;
 		}
 
-		public void DetatchFromCurrentProcess()
+		public void Detatch()
 		{
 			this.EnsureAttachedToProcess();
-			
+
 			this.currentDataTarget.DebuggerInterface.DetachProcesses();
 			this.currentDataTarget.Dispose();
+			
+			this.currentProcess = null;
+			this.currentClrRuntime = null;
 			this.currentDataTarget = null;
 		}
 
 		private void EnsureAttachedToProcess()
 		{
-			if(this.currentDataTarget == null)
+			if(this.currentProcess == null)
 			{
 				throw new InvalidOperationException("Not attached to any process right now.");
 			}

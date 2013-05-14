@@ -14,30 +14,30 @@ namespace HackedBrain.ScriptCs.ClrMd
 		{
 			Contract.Requires(clrRuntime != null);
 
-			ClrHeap heap = clrRuntime.GetHeap();
-
-			IEnumerable<TypeHeapStat> results = from oid in heap.EnumerateObjects()
-												let ot = heap.GetObjectType(oid)
-												group oid by ot into objectTypeGroup
-												let otSize = objectTypeGroup.Sum(oid => (uint)objectTypeGroup.Key.GetSize(oid))
-												orderby otSize
-												select new TypeHeapStat
-												{
-													TypeName = objectTypeGroup.Key.Name,
-													TotalHeapSize = otSize,
-													NumberOfInstances = objectTypeGroup.Count()
-												};
-
-			return results;
+			return ClrRuntimeExtensions.GetHeapStatsByTypeForObjectSet(clrRuntime, clrRuntime.GetHeap().EnumerateObjects());
 		}
 
-		public static IEnumerable<TypeHeapStat> GetHeapStatsByType(this ClrRuntime clrRuntime, string typeNameFilter)
+		public static IEnumerable<TypeHeapStat> GetFinalizerQueueHeapStatsByType(this ClrRuntime clrRuntime)
 		{
-			IEnumerable<TypeHeapStat> results = clrRuntime.GetHeapStatsByType();
+			Contract.Requires(clrRuntime != null);
 
-			results = results.Where(hs => hs.TypeName.StartsWith(typeNameFilter));
+			return ClrRuntimeExtensions.GetHeapStatsByTypeForObjectSet(clrRuntime, clrRuntime.EnumerateFinalizerQueue());
+		}
 
-			return results;
+		private static IEnumerable<TypeHeapStat> GetHeapStatsByTypeForObjectSet(ClrRuntime clrRuntime, IEnumerable<ulong> objectIdSet)
+		{
+			ClrHeap heap = clrRuntime.GetHeap();
+
+			return from oid in objectIdSet
+				   let ot = heap.GetObjectType(oid)
+				   group oid by ot into objectTypeGroup
+				   let otSize = objectTypeGroup.Sum(oid => (uint)objectTypeGroup.Key.GetSize(oid))
+				   select new TypeHeapStat
+				   {
+					   TypeName = objectTypeGroup.Key.Name,
+					   TotalHeapSize = otSize,
+					   NumberOfInstances = objectTypeGroup.Count()
+				   };
 		}
 	}
 }

@@ -21,32 +21,35 @@ Using ScriptCS.ClrMD in REPL mode is probably the most powerful way to work with
    imported by the ScriptCs.ClrMD script pack like so:
 
 ```csharp
-   // First require the ClrMdPack
-   > var clrmd = Require<ClrMdPack>();
+  // First require the ClrMdPack
+  > var clrmd = Require<ClrMdPack>();
    
-   // Now attach to a running .NET process which will give us back a ClrMD ClrRuntime instance
-   > var clrRuntime = clrmd.AttachToProcess("MyDotNetApplication");
+  // Now attach to a running .NET process which will give us back a ClrMD ClrRuntime instance
+  > var clrRuntime = clrmd.Attach("MyDotNetApplication");
    
-   // Now we can simply us the raw ClrMD API directly
-   > Console.WriteLine(clrRuntime.Threads.Count);
-   
-   // Or we can use an extension method included by the script pack for higher level analytics
-   > clrRuntime.GetHeapStatsByType().ToList().ForEach(s => Console.WriteLine("{0,12:n0} {1,12:n0} {2}", s.TotalHeapSize, s.NumberOfInstances, s.TypeName));
+  // We can use one of the built in DumpXXX methods to dump useful, predefined statistics
+  > clrmd.DumpHeapStatsByType();
 ```
 
 Here's a sample of the output the command above command might output to the REPL window:
 ```
-      1,672           21 System.String[]
-      1,838           20 System.Char[]
-      2,008           24 System.Int32[]
-      2,968           53 System.RuntimeType
-     12,232          249 System.String
-     36,192           42 System.Object[]
+    1,672           21 System.String[]
+    1,838           20 System.Char[]
+    2,008           24 System.Int32[]
+    2,968           53 System.RuntimeType
+   12,232          249 System.String
+   36,192           42 System.Object[]
 ```
 
 ```csharp
-    // Finally we can detatch from the process to let it resume executing once we're done inspecting it
-    > clrmd.DetatchFromCurrentProcess();
+  // Now we can simply us the raw ClrMD API directly
+  > Console.WriteLine(clrRuntime.Threads.Count);    
+
+  // We can use an extension method included by the script pack for higher level analytics and dump ourselves manually
+  > clrRuntime.GetHeapStatsByType().Where(ths => ths.TypeName.StartsWith("MyNamespace")).OrderByDescending(ths => ths.TotalHeapSize).ToList().ForEach(s => Console.WriteLine("{0,12:n0} {1,12:n0} {2}", s.TotalHeapSize, s.NumberOfInstances, s.TypeName));
+
+  // Finally we can detatch from the process to let it resume executing once we're done inspecting it
+  > clrmd.Detatch();
 ```
 
 Script Style

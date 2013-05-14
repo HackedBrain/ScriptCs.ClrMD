@@ -7,7 +7,7 @@
     <ProjectGuid>{DE740E6E-8EE6-47A9-8BA0-6071B9A0363D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>HackedBrain.ScriptCs.ClrMD</RootNamespace>
+    <RootNamespace>HackedBrain.ScriptCs.ClrMd</RootNamespace>
     <AssemblyName>ScriptCs.ClrMD</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -61,14 +61,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClrMdPack.Commands.Heap.cs" />
     <Compile Include="ClrMdPack.cs" />
     <Compile Include="ClrRuntimeExtensions.cs" />
+    <Compile Include="ConsoleOutputWriter.cs" />
+    <Compile Include="ClrMdPack.Commands.Threads.cs" />
+    <Compile Include="IOutputWriter.cs" />
     <Compile Include="TypeHeapStat.cs" />
     <Compile Include="ScriptPack.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="samples\DumpHeapStats.csx" />
     <None Include="ScriptCs.ClrMD.nuspec" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

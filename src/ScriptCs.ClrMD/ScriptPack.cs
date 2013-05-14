@@ -8,9 +8,16 @@ namespace HackedBrain.ScriptCs.ClrMd
 {
 	public class ScriptPack : IScriptPack
 	{
+		private ClrMdPack clrMdPack;
+		
 		IScriptPackContext IScriptPack.GetContext()
 		{
-			return new ClrMdPack();
+			if(this.clrMdPack == null)
+			{
+				this.clrMdPack = new ClrMdPack();
+			}
+
+			return this.clrMdPack;
 		}
 
 		void IScriptPack.Initialize(IScriptPackSession session)
@@ -21,6 +28,13 @@ namespace HackedBrain.ScriptCs.ClrMd
 
 		void IScriptPack.Terminate()
 		{
+			if(this.clrMdPack != null
+					&&
+				this.clrMdPack.IsAttached)
+			{
+				this.clrMdPack.Detatch();
+				this.clrMdPack = null;
+			}
 		}
 	}
 }
