@@ -88,7 +88,7 @@ namespace HackedBrain.ScriptCs.ClrMd
 		{
 			if(this.currentProcess != null)
 			{
-				throw new InvalidOperationException(string.Format("Already attached to process {0}:{1}, use DetachFromCurrentProcess first.", this.currentProcess.ProcessName, this.currentProcess.Id));
+				throw new InvalidOperationException(string.Format("Already attached to process {0}:{1}, use Detach() first.", this.currentProcess.ProcessName, this.currentProcess.Id));
 			}
 
 			DataTarget dataTarget = DataTarget.AttachToProcess(process.Id, (uint)attachWaitTimeMilliseconds);
