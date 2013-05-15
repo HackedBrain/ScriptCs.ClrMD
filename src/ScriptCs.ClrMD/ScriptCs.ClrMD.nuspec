@@ -2,7 +2,7 @@
 <package>
 	<metadata>
 		<id>ScriptCs.ClrMd</id>
-		<version>0.1.1-beta</version>
+		<version>0.1.2-beta</version>
 		<title>ScriptCs.ClrMd</title>
 		<description>
 			A script pack for ScriptCS that brings in the ClrMD API and additional functionality around it

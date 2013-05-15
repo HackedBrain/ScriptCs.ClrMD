@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Diagnostics.Runtime;
 
 namespace HackedBrain.ScriptCs.ClrMd
@@ -51,6 +48,37 @@ namespace HackedBrain.ScriptCs.ClrMd
 				}
 
 				this.outputWriter.WriteLineSeparator();
+			}
+		}
+
+		public void DumpBlockedClrThreads()
+		{
+			IEnumerable<ClrThread> threads = this.currentClrRuntime.Threads;
+
+			threads = threads.Where(t => t.BlockingObjects != null && t.BlockingObjects.Count > 0);
+
+			if(threads.Any())
+			{
+				ClrHeap heap = this.ClrRuntime.GetHeap();
+
+				foreach(ClrThread thread in threads)
+				{
+					this.outputWriter.WriteLine("OS ThreadID: {0:X}", thread.OSThreadId);
+					this.outputWriter.WriteLine("Managed ThreadID: {0:D}", thread.ManagedThreadId);
+
+					foreach(BlockingObject blockingObject in thread.BlockingObjects)
+					{
+						ClrType blockingObjectType = heap.GetObjectType(blockingObject.Object);
+
+						this.outputWriter.WriteLine("{0:12X} {1}", blockingObject.Object, blockingObjectType.Name);
+					}
+
+					this.outputWriter.WriteLineSeparator();
+				}
+			}
+			else
+			{
+				this.outputWriter.WriteLine("No threads are blocked at this time.");
 			}
 		}
 
