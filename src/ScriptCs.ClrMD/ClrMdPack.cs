@@ -64,7 +64,7 @@ namespace HackedBrain.ScriptCs.ClrMd
 		{
 			return this.Attach(processName, ClrMdPack.DefaultAttachWaitTimeMilliseconds);
 		}
-		
+
 		public ClrRuntime Attach(string processName, int attachWaitTimeMilliseconds)
 		{
 			Process[] processes = Process.GetProcessesByName(processName);
@@ -84,7 +84,7 @@ namespace HackedBrain.ScriptCs.ClrMd
 		public ClrRuntime Attach(int processId)
 		{
 			Process processToAttachTo = Process.GetProcessById(processId);
-			
+
 			return this.Attach(processToAttachTo, ClrMdPack.DefaultAttachWaitTimeMilliseconds);
 		}
 
@@ -99,8 +99,7 @@ namespace HackedBrain.ScriptCs.ClrMd
 		{
 			if(this.currentProcess != null)
 			{
-				// TODO: find way to put process id/name in this exception message
-				throw new InvalidOperationException(string.Format("Already attached to a process, use DetatchFromCurrentProcess first."));
+				throw new InvalidOperationException(string.Format("Already attached to process {0}:{1}, use Detach() first.", this.currentProcess.ProcessName, this.currentProcess.Id));
 			}
 
 			DataTarget dataTarget = DataTarget.AttachToProcess(process.Id, (uint)attachWaitTimeMilliseconds);
@@ -115,8 +114,8 @@ namespace HackedBrain.ScriptCs.ClrMd
 				// REVISIT: what happens if there's multiple ClrVersions?
 			}
 
-			ClrInfo clrInfo = dataTarget.ClrVersions[0];		
-			
+			ClrInfo clrInfo = dataTarget.ClrVersions[0];
+
 			string dacLocation = clrInfo.TryGetDacLocation();
 
 			// Make sure we found the DAC location, otherwise we can't create the runtime
@@ -138,13 +137,13 @@ namespace HackedBrain.ScriptCs.ClrMd
 			return this.currentClrRuntime;
 		}
 
-		public void Detatch()
+		public void Detach()
 		{
 			this.EnsureAttachedToProcess();
 
 			this.currentDataTarget.DebuggerInterface.DetachProcesses();
 			this.currentDataTarget.Dispose();
-			
+
 			this.currentProcess = null;
 			this.currentClrRuntime = null;
 			this.currentDataTarget = null;
