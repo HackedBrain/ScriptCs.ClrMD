@@ -24,11 +24,13 @@ namespace HackedBrain.ScriptCs.ClrMd
 
 		void IScriptPack.Terminate()
 		{
-			if(this.clrMdPack != null
-					&&
-				this.clrMdPack.IsAttached)
+			if(this.clrMdPack != null)
 			{
-				this.clrMdPack.Detach();
+				if(this.clrMdPack.IsAttached)
+				{
+					this.clrMdPack.Detach();
+				}
+
 				this.clrMdPack = null;
 			}
 		}

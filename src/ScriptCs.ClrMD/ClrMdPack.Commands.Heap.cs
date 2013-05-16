@@ -40,7 +40,7 @@ namespace HackedBrain.ScriptCs.ClrMd
 			this.DumpFinalizerQueueHeapStatsByType(0, 0, null);
 		}
 
-		public void DumpFinalizerQueueHeapStatsByType(int minSize)
+		public void DumpFinalizerQueueHeapStatsByType(long minSize)
 		{
 			this.DumpFinalizerQueueHeapStatsByType(minSize, 0, null);
 		}
@@ -50,7 +50,7 @@ namespace HackedBrain.ScriptCs.ClrMd
 			this.DumpFinalizerQueueHeapStatsByType(0, 0, typeName);
 		}
 
-		public void DumpFinalizerQueueHeapStatsByType(int minSize, string typeName)
+		public void DumpFinalizerQueueHeapStatsByType(long minSize, string typeName)
 		{
 			this.DumpFinalizerQueueHeapStatsByType(minSize, 0, typeName);
 		}

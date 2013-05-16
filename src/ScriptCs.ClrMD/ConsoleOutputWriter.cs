@@ -22,7 +22,7 @@ namespace HackedBrain.ScriptCs.ClrMd
 
 		public void WriteLineSeparator()
 		{
-			Console.WriteLine(new string('-', Console.WindowWidth));
+			Console.WriteLine(new string('-', Console.WindowWidth / 2));
 		}
 
 		#endregion

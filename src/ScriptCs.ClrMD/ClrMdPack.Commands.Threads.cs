@@ -36,10 +36,7 @@ namespace HackedBrain.ScriptCs.ClrMd
 
 					if(thread.StackTrace.Count > 0)
 					{
-						foreach(ClrStackFrame frame in thread.StackTrace)
-						{
-							this.outputWriter.WriteLine("{0,12:X} {1,12:X} {2}", frame.InstructionPointer, frame.StackPointer, frame.DisplayString);
-						}
+						this.DumpThreadStackTrace(thread);
 					}
 					else
 					{
@@ -82,9 +79,35 @@ namespace HackedBrain.ScriptCs.ClrMd
 			}
 		}
 
+		public void DumpStack(int managedThreadId)
+		{
+			ClrThread thread = this.ClrRuntime.Threads.Where(t => t.ManagedThreadId == managedThreadId).FirstOrDefault();
+
+			if(thread != null)
+			{
+				this.outputWriter.WriteLine("OS ThreadID: {0:X}", thread.OSThreadId);
+				this.outputWriter.WriteLine("Managed ThreadID: {0:D}", thread.ManagedThreadId);
+				this.outputWriter.WriteLine(string.Empty);
+				
+				this.DumpThreadStackTrace(thread);
+			}
+			else
+			{
+				this.outputWriter.WriteLine("No thread with the specified managed thread id was found.");
+			}
+		}
+
 		private static string YorN(bool value)
 		{
 			return value ? "Y" : "N";
+		}
+
+		private void DumpThreadStackTrace(ClrThread thread)
+		{
+			foreach(ClrStackFrame frame in thread.StackTrace)
+			{
+				this.outputWriter.WriteLine("  {0,12:X} {1,12:X} {2}", frame.InstructionPointer, frame.StackPointer, frame.DisplayString);
+			}
 		}
 	}
 }
