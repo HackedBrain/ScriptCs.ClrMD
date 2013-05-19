@@ -62,6 +62,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClrMdPack.Commands.AppDomainsAndModules.cs" />
     <Compile Include="ClrMdPack.Commands.Heap.cs" />
     <Compile Include="ClrMdPack.cs" />
     <Compile Include="ClrRuntimeExtensions.cs" />
@@ -80,7 +81,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="BeforeBuild">
-	 <MakeDir Directories="$(ArtifactsDir)" Condition="!Exists('$(ArtifactsDir)')" />
+    <MakeDir Directories="$(ArtifactsDir)" Condition="!Exists('$(ArtifactsDir)')" />
   </Target>
   <Target Name="AfterBuild">
   </Target>
