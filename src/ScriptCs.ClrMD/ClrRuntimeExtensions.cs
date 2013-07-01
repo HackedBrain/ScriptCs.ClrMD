@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.IO;
 using System.Linq;
 using Microsoft.Diagnostics.Runtime;
 
@@ -21,6 +23,14 @@ namespace HackedBrain.ScriptCs.ClrMd
 			return ClrRuntimeExtensions.GetHeapStatsByTypeForObjectSet(clrRuntime, clrRuntime.EnumerateFinalizerQueue());
 		}
 
+		public static IEnumerable<ClrType> GetTypesInModule(this ClrRuntime clrRuntime, string moduleShortName)
+		{
+			return (from cm in clrRuntime.EnumerateModules()
+					where cm.Name.StartsWith(moduleShortName)
+					from t in cm.EnumerateTypes()
+					select t);
+		}
+
 		private static IEnumerable<TypeHeapStat> GetHeapStatsByTypeForObjectSet(ClrRuntime clrRuntime, IEnumerable<ulong> objectIdSet)
 		{
 			ClrHeap heap = clrRuntime.GetHeap();
@@ -35,6 +45,31 @@ namespace HackedBrain.ScriptCs.ClrMd
 					   TotalHeapSize = otSize,
 					   NumberOfInstances = objectTypeGroup.Count()
 				   };
+		}
+
+		public static string GetShortName(this ClrModule module)
+		{
+			string moduleFullName = module.Name;
+			
+			int lastPathSeparatorIndex = moduleFullName.LastIndexOf(Path.DirectorySeparatorChar);
+
+			if(lastPathSeparatorIndex == -1)
+			{
+				lastPathSeparatorIndex = moduleFullName.LastIndexOf(Path.AltDirectorySeparatorChar);
+			}
+
+			string result;
+
+			if(lastPathSeparatorIndex > -1)
+			{
+				result = moduleFullName.Substring(lastPathSeparatorIndex + 1);
+			}
+			else
+			{
+				result = moduleFullName;
+			}
+
+			return result;
 		}
 	}
 }

@@ -1,28 +1,32 @@
 ﻿using System;
+using ScriptCs.Contracts;
 
 namespace HackedBrain.ScriptCs.ClrMd
 {
 	public class ConsoleOutputWriter : IOutputWriter
 	{
-		public ConsoleOutputWriter()
+		private IConsole console;
+		
+		public ConsoleOutputWriter(IConsole console)
 		{
+			this.console = console;
 		}
 
 		#region IOutputWriter implemenation
 
 		public void WriteLine(string output)
 		{
-			Console.WriteLine(output);
+			this.console.WriteLine(output);
 		}
 
 		public void WriteLine(string outputFormat, params object[] formatValues)
 		{
-			Console.WriteLine(outputFormat, formatValues);
+			this.console.WriteLine(string.Format(outputFormat, formatValues));
 		}
 
 		public void WriteLineSeparator()
 		{
-			Console.WriteLine(new string('-', Console.WindowWidth / 2));
+			this.console.WriteLine("--------------------");
 		}
 
 		#endregion

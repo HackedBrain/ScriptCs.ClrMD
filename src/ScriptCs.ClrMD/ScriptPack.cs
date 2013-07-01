@@ -1,16 +1,24 @@
-﻿using ScriptCs.Contracts;
+﻿using System.ComponentModel.Composition;
+using ScriptCs.Contracts;
 
 namespace HackedBrain.ScriptCs.ClrMd
 {
 	public class ScriptPack : IScriptPack
 	{
 		private ClrMdPack clrMdPack;
+		private IConsole console;
+
+		[ImportingConstructor]
+		public ScriptPack(IConsole console)
+		{
+			this.console = console;
+		}
 		
 		IScriptPackContext IScriptPack.GetContext()
 		{
 			if(this.clrMdPack == null)
 			{
-				this.clrMdPack = new ClrMdPack();
+				this.clrMdPack = new ClrMdPack(new ConsoleOutputWriter(console));
 			}
 
 			return this.clrMdPack;

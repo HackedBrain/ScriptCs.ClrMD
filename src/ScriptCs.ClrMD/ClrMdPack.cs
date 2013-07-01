@@ -16,9 +16,9 @@ namespace HackedBrain.ScriptCs.ClrMd
 		private Process currentProcess;
 		private IOutputWriter outputWriter;
 
-		public ClrMdPack()
+		public ClrMdPack(IOutputWriter outputWriter)
 		{
-			this.outputWriter = new ConsoleOutputWriter();
+			this.outputWriter = outputWriter;
 		}
 
 		public bool IsAttached

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,12 +36,12 @@ namespace HackedBrain.ScriptCs.ClrMd
 		public void DumpModules(int appDomainId)
 		{
 			Contract.Requires(appDomainId > 0);
-			
+
 			ClrAppDomain appDomain = this.currentClrRuntime.AppDomains.FirstOrDefault(ad => ad.Id == appDomainId);
 
 			if(appDomain != null)
 			{
-				this.DumpModulesForAppDomain(appDomain);	
+				this.DumpModulesForAppDomain(appDomain);
 			}
 			else
 			{
@@ -64,15 +65,30 @@ namespace HackedBrain.ScriptCs.ClrMd
 			}
 		}
 
+		public void DumpModuleTypes(string moduleShortName)
+		{
+			IEnumerable<ClrType> typesInModule = from module in this.ClrRuntime.EnumerateModules()
+												 where module.GetShortName().StartsWith(moduleShortName)
+												 from type in module.EnumerateTypes()
+												 select type;
+
+			foreach(ClrType type in typesInModule)
+			{
+				this.outputWriter.WriteLine("Name: {0}", type.Name);
+				this.outputWriter.WriteLine("Base Type: {0}", type.BaseType.Name);
+			}
+		}
+
 		private void DumpModulesForAppDomain(ClrAppDomain appDomain)
 		{
 			Contract.Requires(appDomain != null);
 
 			this.outputWriter.WriteLine("AppDomain: {0} ({1})", appDomain.Name, appDomain.Id);
 			this.outputWriter.WriteLine(string.Empty);
-			
+
 			foreach(ClrModule module in appDomain.Modules)
 			{
+				string moduleShortName = module.GetShortName();
 				string isDynamicIndicator;
 
 				if(module.IsDynamic)
@@ -84,7 +100,7 @@ namespace HackedBrain.ScriptCs.ClrMd
 					isDynamicIndicator = string.Empty;
 				}
 
-				this.outputWriter.WriteLine("{0}{1} - {2}", module.Name, isDynamicIndicator, module.MetadataAddress);
+				this.outputWriter.WriteLine("{0:X12} {1} {2}{3}", module.MetadataAddress, moduleShortName, module.AssemblyName, isDynamicIndicator);
 			}
 		}
 	}
